@@ -28,7 +28,7 @@ function mapAssetToVevAsset(asset: BynderAPIAsset) {
   return {
     key: asset.id,
     name: asset.name,
-    thumb: asset.thumbnails.webimage,
+    thumb: asset.thumbnails.thul,
     url: asset.thumbnails.transformBaseUrl,
     type: 'image',
     metadata: {
