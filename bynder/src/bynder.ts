@@ -28,14 +28,15 @@ function mapAssetToVevAsset(asset: BynderAPIAsset) {
   return {
     key: asset.id,
     name: asset.name,
-    thumb: asset.thumbnails.thul,
     url: asset.thumbnails.transformBaseUrl,
-    type: 'image',
+    thumb: asset.thumbnails.thul,
     metadata: {
       description: asset.description,
       width: asset.width,
       height: asset.height,
       link: asset.transformBaseUrl,
+      territory: asset.property_territorynew && asset.property_territorynew[0],
+      subterritory: asset.property_subterritory && asset.property_subterritory[0],
     },
   };
 }
@@ -51,14 +52,17 @@ async function handler(request: Request, env: Record<string, string>, kv: Kv) {
   const search = urlSearchParams.get("search");
 
   const result = await client.searchAssets(search, ['image']);
-  return result.map(mapAssetToVevAsset);
+
+  return {
+    images: result.map(mapAssetToVevAsset)
+  }
 }
 
 registerVevPlugin({
   id: "bynderassetsource",
   name: "Bynder",
   type: "asset-source",
-  icon: "https://cdn.worldvectorlogo.com/logos/bynder.svg",
+  icon: "https://play-lh.googleusercontent.com/7IBBtMND0mS6LNyTp1WVHCRw006eXAoV6VOgKQGWwSHSgnoBG75k_K4j_AYytURtTA=w480-h960-rw",
   form: [
     {
       type: "string",
