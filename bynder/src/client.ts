@@ -1,5 +1,11 @@
-import { Kv } from "./bynder";
-import { BynderAPIAsset } from './types';
+import {
+  BynderAPIAsset,
+  BynderMetaProperties,
+  BynderMetaProperty, Kv,
+  KVBynderMetaProperties,
+  KVBynderMetaProperty, KvKey,
+} from './types';
+import { PROPERTY_PREFIX } from './constants';
 
 interface AuthResponse {
   token_type: string;
@@ -10,10 +16,19 @@ interface AuthResponse {
 
 const AUTH_RETRIES = 3;
 
+enum KVKeys {
+  accessToken = "accessToken",
+  metaproperties = "metaproperties",
+  metaPropertiesTimestamp = "metaPropertiesTimestamp",
+}
+
+const sevenDays = 7 * 24 * 60 * 60 * 1000;
+
 export class BynderClient {
   private readonly clientId: string;
   private readonly clientSecret: string;
   private readonly bynderDomain: string;
+  private readonly metaPropertyCache: Record<string, KVBynderMetaProperty>
   private newTokenRetries = AUTH_RETRIES;
   private kv: Kv;
 
@@ -27,10 +42,11 @@ export class BynderClient {
     this.clientSecret = clientSecret;
     this.bynderDomain = bynderDomain;
     this.kv = kv;
+    this.metaPropertyCache = {};
   }
 
   private async getAccessToken(): Promise<string> {
-    const kvRes = await this.kv.get<string>(["accessToken"]);
+    const kvRes = await this.kv.get<string>([KVKeys.accessToken]);
     if (kvRes.value) {
       console.log(`Using access token from KV: ${kvRes.value}`);
       return kvRes.value;
@@ -53,35 +69,135 @@ export class BynderClient {
     );
 
     const responseJson = (await response.json()) as AuthResponse;
-    await this.kv.set(["accessToken"], responseJson.access_token);
+    await this.kv.set([KVKeys.accessToken], responseJson.access_token);
     return responseJson.access_token;
   }
 
-  public async searchAssets(query: string, type: ("image" | "video")[]): Promise<BynderAPIAsset[]> {
+  private cleanMetaProperties(
+    metaproperties: BynderMetaProperty
+  ): KVBynderMetaProperty {
+    const options: Record<string, KVBynderMetaProperty> = {};
+    const kvMetaProps =
+      metaproperties.options?.map(this.cleanMetaProperties) || [];
+
+    kvMetaProps.forEach((metaprop) => {
+      options[metaprop.name] = metaprop;
+    });
+
+    if (Object.keys(options).length) {
+      return {
+        label: metaproperties.label,
+        name: metaproperties.name,
+        options,
+      };
+    } else {
+      return {
+        label: metaproperties.label,
+        name: metaproperties.name,
+      };
+    }
+  }
+
+  private async getAllMetaProperties(
+    type: ("image" | "video")[]
+  ): Promise<BynderMetaProperties> {
+    console.log("Getting meta properties");
+    const accessToken = await this.getAccessToken();
+
+    const url = `https://${
+      this.bynderDomain
+    }/api/v4/metaproperties?type=${type.join(",")}&options=1`;
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.status === 401) {
+      if (this.newTokenRetries > 0) {
+        this.newTokenRetries--;
+        console.log("Got 401: Requesting new token");
+        await this.requestNewAccessToken();
+        return this.getAllMetaProperties(type);
+      } else {
+        throw new Error("Got 401 and exceeded number of retries");
+      }
+    } else if (response.status === 200) {
+      return await response.json();
+    } else {
+      throw Error(`Got unhandled response status ${response.status}`);
+    }
+  }
+
+  public async syncMetaProperties(type: ("image" | "video")[]) {
+    const kvRes = await this.kv.get<number>([KVKeys.metaPropertiesTimestamp]);
+    const lastSync = kvRes.value || 0;
+
+    if (lastSync < Date.now() - sevenDays) {
+      console.log("Updating stale metaproperties");
+      const bynderMetaProperties = await this.getAllMetaProperties(type);
+
+      const kvPayload: KVBynderMetaProperties = {};
+
+      Object.keys(bynderMetaProperties).forEach((metapropKey) => {
+        kvPayload[`${PROPERTY_PREFIX}${metapropKey}`] = this.cleanMetaProperties(
+          bynderMetaProperties[metapropKey]
+        );
+      });
+
+      await Promise.all(Object.keys(kvPayload).map(async (key) => {
+        try {
+          await this.kv.set([KVKeys.metaproperties, key], kvPayload[key]);
+        } catch(e) {
+          console.error(`Meta property ${key} to big for kv`)
+        }
+      }));
+
+      await this.kv.set([KVKeys.metaPropertiesTimestamp], Date.now());
+    }
+
+    console.log("Metaproperties up to date");
+  }
+
+  public async getMetaProperty(
+    key: KvKey,
+  ): Promise<KVBynderMetaProperty> {
+    if(this.metaPropertyCache[key.join()]) {
+      return this.metaPropertyCache[key.join()];
+    } else {
+      const kvValue = (await this.kv.get<KVBynderMetaProperty>([KVKeys.metaproperties, ...key]))
+        .value;
+      this.metaPropertyCache[key.join()] = kvValue;
+      return kvValue;
+    }
+  }
+
+  public async searchAssets(
+    query: string,
+    type: ("image" | "video")[]
+  ): Promise<BynderAPIAsset[]> {
     console.log(`Searching assets: "${query}" ${type}`);
     const accessToken = await this.getAccessToken();
 
     const url = `https://${this.bynderDomain}/api/v4/media?type=${type.join(
       ","
-    )}${query && query !== "" ? `&keyword=${query}` : ''}`;
+    )}${query && query !== "" ? `&keyword=${query}` : ""}`;
 
-    const response = await fetch(
-      url,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
     if (response.status === 401) {
-      if(this.newTokenRetries > 0) {
+      if (this.newTokenRetries > 0) {
         this.newTokenRetries--;
         console.log("Got 401: Requesting new token");
         await this.requestNewAccessToken();
         return this.searchAssets(query, type);
       } else {
-        throw new Error('Got 401 and exceeded number of retries');
+        throw new Error("Got 401 and exceeded number of retries");
       }
     } else if (response.status === 200) {
       console.log("Success!");

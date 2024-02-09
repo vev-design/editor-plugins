@@ -1,30 +1,41 @@
 import { registerVevPlugin } from "@vev/react";
-import { BynderClient } from './client.js';
-import { BynderAPIAsset } from './types';
+import { BynderClient } from "./client.js";
+import { BynderAPIAsset, Kv, KVBynderMetaProperties } from "./types";
+import { PROPERTY_PREFIX } from "./constants";
 
-// KV types
-type KeyPart = string | number | bigint | boolean | symbol;
+/**
+ *     "property_copyright": "Syngenta Crop Protection AG",
+ *     "property_subterritory": [
+ *       "canada"
+ *     ],
+ */
+async function mapAssetToVevAsset(asset: BynderAPIAsset, client: BynderClient) {
+  const metaData: Record<string, string> = {};
+  await Promise.all(
+    Object.keys(asset).map(async (key) => {
+      if (key.startsWith(PROPERTY_PREFIX)) {
+        const metaProperty = await client.getMetaProperty([key]);
 
-type KvKey = KeyPart[];
+        if (!metaProperty) {
+          console.error(`Missing metaproperty for ${key}`);
+        } else {
+          if (Array.isArray(asset[key])) {
+            const value = metaProperty.options[asset[key][0]].label;
+            if (value) metaData[metaProperty.label] = value;
+          } else if (typeof asset[key] === "object") {
+            const value = metaProperty.options[asset[key]].label;
+            if (value) metaData[metaProperty.label] = value;
+          } else {
+            const value = asset[key];
+            if (value) metaData[metaProperty.label] = asset[key];
+          }
+        }
+      }
+    })
+  );
 
-interface KvCommitResult {
-  ok: true;
-  versionstamp: string;
-}
+  console.log("metaData", metaData);
 
-interface KvEntry<T> {
-  key: KvKey;
-  value: T;
-  versionstamp: string;
-}
-
-export interface Kv {
-  set: (key: KvKey, value: unknown) => Promise<KvCommitResult>;
-  get: <T>(key: KvKey) => Promise<KvEntry<T>>;
-  delete: (key: KvKey) => Promise<void>;
-}
-
-function mapAssetToVevAsset(asset: BynderAPIAsset) {
   return {
     key: asset.id,
     name: asset.name,
@@ -35,27 +46,37 @@ function mapAssetToVevAsset(asset: BynderAPIAsset) {
       width: asset.width,
       height: asset.height,
       link: asset.transformBaseUrl,
-      territory: asset.property_territorynew && asset.property_territorynew[0],
-      subterritory: asset.property_subterritory && asset.property_subterritory[0],
+      ...metaData,
     },
   };
 }
 
-
 async function handler(request: Request, env: Record<string, string>, kv: Kv) {
-  console.log('env', '\n', JSON.stringify(env, null, 4), '\n');
+  console.log("env", "\n", JSON.stringify(env, null, 4), "\n");
   let lastPath = request.url.split("/").splice(-1)[0];
-  const client = new BynderClient(env.clientId, env.clientSecret, env.bynderDomain, kv);
+  const client = new BynderClient(
+    env.clientId,
+    env.clientSecret,
+    env.bynderDomain,
+    kv
+  );
 
   const url = new URL(request.url);
   const urlSearchParams = new URLSearchParams(url.search);
   const search = urlSearchParams.get("search");
 
-  const result = await client.searchAssets(search, ['image']);
+  await client.syncMetaProperties(["image"]);
+  const results = await client.searchAssets(search, ["image"]);
+
+  const images = await Promise.all(
+    results.map(async (result) => {
+      return await mapAssetToVevAsset(result, client);
+    })
+  );
 
   return {
-    images: result.map(mapAssetToVevAsset)
-  }
+    images,
+  };
 }
 
 registerVevPlugin({
