@@ -28,15 +28,15 @@ export async function getSettings(
 ): Promise<any> {
   switch (type) {
     case "global":
-      return getWorkspaceSettings(client, assetType);
+      return getSettingsForm(client, assetType);
     case "team":
-      return getWorkspaceSettings(client, assetType);
+      return getSettingsForm(client, assetType);
     case "workspace":
-      return getWorkspaceSettings(client, assetType);
+      return getSettingsForm(client, assetType);
   }
 }
 
-async function getWorkspaceSettings(
+async function getSettingsForm(
   client: BynderClient,
   assetType: ("image" | "video")[]
 ): Promise<{ form: VevProps[] }> {
@@ -64,6 +64,13 @@ async function getWorkspaceSettings(
   );
 
   return {
-    form: [...metaPropItems],
+    form: [
+      {
+        type: 'object',
+        name: 'property_filter',
+        title: 'Filter on meta data',
+        fields: [...metaPropItems]
+      }
+    ],
   };
 }
