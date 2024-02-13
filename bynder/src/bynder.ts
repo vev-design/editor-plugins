@@ -1,7 +1,8 @@
-import { registerVevPlugin } from "@vev/react";
-import { BynderClient } from "./client.js";
-import { BynderAPIAsset, Kv, KVBynderMetaProperties } from "./types";
-import { PROPERTY_PREFIX } from "./constants";
+import { registerVevPlugin } from '@vev/react';
+import { BynderClient } from './client.js';
+import { BynderAPIAsset, Kv } from './types';
+import { PROPERTY_PREFIX } from './constants';
+import { getSettings, getSettingsPath } from './settings';
 
 /**
  *     "property_copyright": "Syngenta Crop Protection AG",
@@ -34,8 +35,6 @@ async function mapAssetToVevAsset(asset: BynderAPIAsset, client: BynderClient) {
     })
   );
 
-  console.log("metaData", metaData);
-
   return {
     key: asset.id,
     name: asset.name,
@@ -53,13 +52,19 @@ async function mapAssetToVevAsset(asset: BynderAPIAsset, client: BynderClient) {
 
 async function handler(request: Request, env: Record<string, string>, kv: Kv) {
   console.log("env", "\n", JSON.stringify(env, null, 4), "\n");
-  let lastPath = request.url.split("/").splice(-1)[0];
+  const settingType = getSettingsPath(request.url);
+
   const client = new BynderClient(
     env.clientId,
     env.clientSecret,
     env.bynderDomain,
     kv
   );
+
+  // Handle settings
+  if (settingType) {
+    return getSettings(settingType, client, ["image"]);
+  }
 
   const url = new URL(request.url);
   const urlSearchParams = new URLSearchParams(url.search);
