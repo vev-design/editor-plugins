@@ -1,8 +1,8 @@
-import { registerVevPlugin } from '@vev/react';
-import { BynderClient } from './client.js';
-import { BynderAPIAsset, Kv } from './types';
-import { PROPERTY_PREFIX } from './constants';
-import { getSettings, getSettingsPath } from './settings';
+import { registerVevPlugin } from "@vev/react";
+import { BynderClient } from "./client.js";
+import { BynderAPIAsset, Kv } from "./types";
+import { PROPERTY_PREFIX } from "./constants";
+import { getSettings, getSettingsPath } from "./settings";
 
 /**
  *     "property_copyright": "Syngenta Crop Protection AG",
@@ -51,7 +51,14 @@ async function mapAssetToVevAsset(asset: BynderAPIAsset, client: BynderClient) {
 }
 
 async function handler(request: Request, env: Record<string, string>, kv: Kv) {
-  console.log("env", "\n", JSON.stringify(env, null, 4), "\n");
+  let body = null;
+  try {
+    body = await request.json();
+  } catch (e) {
+    console.log(e);
+    console.log("No request body");
+  }
+
   const settingType = getSettingsPath(request.url);
 
   const client = new BynderClient(
@@ -71,7 +78,7 @@ async function handler(request: Request, env: Record<string, string>, kv: Kv) {
   const search = urlSearchParams.get("search");
 
   await client.syncMetaProperties(["image"]);
-  const results = await client.searchAssets(search, ["image"]);
+  const results = await client.searchAssets(search, body, ["image"]);
 
   const images = await Promise.all(
     results.map(async (result) => {

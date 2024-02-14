@@ -79,3 +79,7 @@ export interface Kv {
   get: <T>(key: KvKey) => Promise<KvEntry<T>>;
   delete: (key: KvKey) => Promise<void>;
 }
+
+export interface Filter {
+  property_filter: Record<string, string[]>
+}

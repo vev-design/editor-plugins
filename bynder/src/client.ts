@@ -1,12 +1,12 @@
 import {
   BynderAPIAsset,
   BynderMetaProperties,
-  BynderMetaProperty,
+  BynderMetaProperty, Filter,
   Kv,
   KVBynderMetaProperties,
   KVBynderMetaProperty,
   KvKey,
-} from "./types";
+} from './types';
 import { PROPERTY_PREFIX } from "./constants";
 
 interface AuthResponse {
@@ -177,14 +177,32 @@ export class BynderClient {
 
   public async searchAssets(
     query: string,
+    filter: Filter | null,
     type: ("image" | "video")[]
   ): Promise<BynderAPIAsset[]> {
     console.log(`Searching assets: "${query}" ${type}`);
     const accessToken = await this.getAccessToken();
 
-    const url = `https://${this.bynderDomain}/api/v4/media?type=${type.join(
-      ","
-    )}${query && query !== "" ? `&keyword=${query}` : ""}`;
+    const params = new URLSearchParams();
+
+    params.set("type", type.join(','));
+
+    if(query && query !== "") {
+      params.set('keyword', query);
+    }
+
+    if(filter) {
+      Object.keys(filter.property_filter).forEach((metaprop) => {
+        const values = filter.property_filter[metaprop];
+        if(values.length !== 0) {
+          params.set(`${PROPERTY_PREFIX}${metaprop}`, values.join(','));
+        }
+      });
+    }
+
+    const url = `https://${this.bynderDomain}/api/v4/media?${params.toString()}`;
+
+    console.log(url);
 
     const response = await fetch(url, {
       headers: {
@@ -197,7 +215,7 @@ export class BynderClient {
         this.newTokenRetries--;
         console.log("Got 401: Requesting new token");
         await this.requestNewAccessToken();
-        return this.searchAssets(query, type);
+        return this.searchAssets(query, filter, type);
       } else {
         throw new Error("Got 401 and exceeded number of retries");
       }
