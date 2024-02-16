@@ -2,12 +2,11 @@ import {
   BynderAPIAsset,
   BynderMetaProperties,
   BynderMetaProperty, Filter,
-  Kv,
   KVBynderMetaProperties,
   KVBynderMetaProperty,
-  KvKey,
 } from './types';
 import { PROPERTY_PREFIX } from "./constants";
+import { Kv, KvKey } from '@vev/utils';
 
 interface AuthResponse {
   token_type: string;

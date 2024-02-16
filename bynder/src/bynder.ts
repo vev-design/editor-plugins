@@ -1,8 +1,9 @@
-import { registerVevPlugin } from "@vev/react";
-import { BynderClient } from "./client.js";
-import { BynderAPIAsset, Kv } from "./types";
-import { PROPERTY_PREFIX } from "./constants";
-import { getSettings, getSettingsPath } from "./settings";
+import { registerVevPlugin } from '@vev/react';
+import { BynderClient } from './client.js';
+import { BynderAPIAsset } from './types';
+import { PROPERTY_PREFIX } from './constants';
+import { getSettings, getSettingsPath } from './settings';
+import { EditorPluginType, Kv, AssetSourceResult, Settings } from '@vev/utils';
 
 /**
  *     "property_copyright": "Syngenta Crop Protection AG",
@@ -50,7 +51,7 @@ async function mapAssetToVevAsset(asset: BynderAPIAsset, client: BynderClient) {
   };
 }
 
-async function handler(request: Request, env: Record<string, string>, kv: Kv) {
+async function handler(request: Request, env: Record<string, string>, kv: Kv): Promise<AssetSourceResult | Settings> {
   let body = null;
   try {
     body = await request.json();
@@ -94,7 +95,7 @@ async function handler(request: Request, env: Record<string, string>, kv: Kv) {
 registerVevPlugin({
   id: "bynderassetsource",
   name: "Bynder",
-  type: "asset-source",
+  type: EditorPluginType.ASSET_SOURCE,
   icon: "https://play-lh.googleusercontent.com/7IBBtMND0mS6LNyTp1WVHCRw006eXAoV6VOgKQGWwSHSgnoBG75k_K4j_AYytURtTA=w480-h960-rw",
   form: [
     {

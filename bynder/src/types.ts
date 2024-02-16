@@ -55,31 +55,6 @@ export interface KVBynderMetaProperty {
   options?: Record<string, KVBynderMetaProperty>;
 }
 
-/**
- * Remove when CLI is updated
- */
-// KV types
-export type KeyPart = string | number | bigint | boolean | symbol;
-
-export type KvKey = KeyPart[];
-
-export interface KvCommitResult {
-  ok: true;
-  versionstamp: string;
-}
-
-export interface KvEntry<T> {
-  key: KvKey;
-  value: T;
-  versionstamp: string;
-}
-
-export interface Kv {
-  set: (key: KvKey, value: unknown) => Promise<KvCommitResult>;
-  get: <T>(key: KvKey) => Promise<KvEntry<T>>;
-  delete: (key: KvKey) => Promise<void>;
-}
-
 export interface Filter {
   property_filter: Record<string, string[]>
 }
