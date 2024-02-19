@@ -1,5 +1,5 @@
 import { BynderClient } from "./client";
-import { VevProps } from "@vev/react";
+import { VevProps } from "@vev/utils";
 
 type settingsType = "global" | "workspace" | "team" | null;
 

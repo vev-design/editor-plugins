@@ -6,7 +6,7 @@ import {
   KVBynderMetaProperty,
 } from './types';
 import { PROPERTY_PREFIX } from "./constants";
-import { Kv, KvKey } from '@vev/utils';
+import { EditorPluginKv, EditorPluginKvKey } from '@vev/utils';
 
 interface AuthResponse {
   token_type: string;
@@ -31,13 +31,13 @@ export class BynderClient {
   private readonly bynderDomain: string;
   private readonly metaPropertyCache: Record<string, KVBynderMetaProperty>;
   private newTokenRetries = AUTH_RETRIES;
-  private kv: Kv;
+  private kv: EditorPluginKv;
 
   constructor(
     clientId: string,
     clientSecret: string,
     bynderDomain: string,
-    kv: Kv
+    kv: EditorPluginKv
   ) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
@@ -162,7 +162,7 @@ export class BynderClient {
     console.log("Metaproperties up to date");
   }
 
-  public async getMetaProperty(key: KvKey): Promise<KVBynderMetaProperty> {
+  public async getMetaProperty(key: EditorPluginKvKey): Promise<KVBynderMetaProperty> {
     if (this.metaPropertyCache[key.join()]) {
       return this.metaPropertyCache[key.join()];
     } else {
