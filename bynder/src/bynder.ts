@@ -1,9 +1,14 @@
-import { registerVevPlugin } from '@vev/react';
-import { BynderClient } from './client.js';
-import { BynderAPIAsset } from './types';
-import { PROPERTY_PREFIX } from './constants';
-import { getSettings, getSettingsPath } from './settings';
-import { EditorPluginType, Kv, AssetSourceResult, Settings } from '@vev/utils';
+import { registerVevPlugin } from "@vev/react";
+import { BynderClient } from "./client.js";
+import { BynderAPIAsset } from "./types";
+import { PROPERTY_PREFIX } from "./constants";
+import { getSettings, getSettingsPath } from "./settings";
+import {
+  EditorPluginType,
+  EditorPluginKv,
+  EditorPluginAssetSourceResult,
+  EditorPluginSettings,
+} from "@vev/utils";
 
 /**
  *     "property_copyright": "Syngenta Crop Protection AG",
@@ -11,7 +16,16 @@ import { EditorPluginType, Kv, AssetSourceResult, Settings } from '@vev/utils';
  *       "canada"
  *     ],
  */
-async function mapAssetToVevAsset(asset: BynderAPIAsset, client: BynderClient) {
+async function mapAssetToVevAsset(
+  asset: BynderAPIAsset,
+  client: BynderClient
+): Promise<{
+  key: string;
+  name: string;
+  url: string;
+  thumb: string;
+  metadata?: Record<string, string | number>;
+}> {
   const metaData: Record<string, string> = {};
   await Promise.all(
     Object.keys(asset).map(async (key) => {
@@ -51,7 +65,11 @@ async function mapAssetToVevAsset(asset: BynderAPIAsset, client: BynderClient) {
   };
 }
 
-async function handler(request: Request, env: Record<string, string>, kv: Kv): Promise<AssetSourceResult | Settings> {
+async function handler(
+  request: Request,
+  env: Record<string, string>,
+  kv: EditorPluginKv
+): Promise<EditorPluginAssetSourceResult | EditorPluginSettings> {
   let body = null;
   try {
     body = await request.json();
