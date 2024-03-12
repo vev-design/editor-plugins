@@ -1,4 +1,5 @@
 import { SearchResponse } from './types';
+import { getPropertiesFromRequest } from './settings';
 
 export class Client {
   cloud: string;
@@ -11,11 +12,21 @@ export class Client {
     this.secret = secret;
   }
 
-  async searchAssets(query: string): Promise<SearchResponse> {
+  async searchAssets(query: string, resourceType?: 'image' | 'video' | 'other'): Promise<SearchResponse> {
+    let expression = query;
+
+    if(resourceType && resourceType != 'other') {
+      expression = `resource_type:${resourceType} AND ${query}`
+    }
+
+    if(resourceType && resourceType == 'other') {
+      expression = `resource_type:raw AND ${query}`
+    }
+
     const body = {
-      expression: query,
+      expression,
       sort_by: [{ score: "desc" }],
-      max_results: 100,
+      max_results: 50,
     };
 
     const response = await fetch(

@@ -8,6 +8,11 @@ import {
   ProjectVideoAsset,
 } from "./vev-types";
 import { Resource } from "./types";
+import {
+  getPropertiesFromRequest,
+  getSettings,
+  getSettingsPath,
+} from "./settings";
 
 function getMimeType(resource: Resource): string {
   if (resource.resource_type !== "raw") {
@@ -17,7 +22,10 @@ function getMimeType(resource: Resource): string {
   }
 }
 
-function mapAssetToVevAsset(resources: Resource[]): ProjectAsset[] {
+function mapAssetToVevAsset(
+  resources: Resource[],
+  selfHostAssets?: boolean
+): ProjectAsset[] {
   return resources.map((resource) => {
     switch (resource.resource_type) {
       case "image":
@@ -27,6 +35,7 @@ function mapAssetToVevAsset(resources: Resource[]): ProjectAsset[] {
           filename: resource.filename,
           mimeType: getMimeType(resource),
           dimension: { width: resource.width, height: resource.height },
+          selfHosted: !!selfHostAssets,
         } as ProjectImageAsset;
       case "video":
         return {
@@ -36,6 +45,7 @@ function mapAssetToVevAsset(resources: Resource[]): ProjectAsset[] {
           mimeType: getMimeType(resource),
           duration: resource.duration,
           dimension: { width: resource.width, height: resource.height },
+          selfHosted: !!selfHostAssets,
         } as ProjectVideoAsset;
       case "raw":
         return {
@@ -43,6 +53,7 @@ function mapAssetToVevAsset(resources: Resource[]): ProjectAsset[] {
           url: resource.url,
           filename: resource.filename,
           mimeType: getMimeType(resource),
+          selfHosted: !!selfHostAssets,
         } as BaseProjectAsset;
     }
   });
@@ -53,14 +64,21 @@ async function handler(
   env: Record<string, string>,
   kv: EditorPluginKv
 ): Promise<ProjectAsset[]> {
+  const requestProperties = await getPropertiesFromRequest(request);
+  console.log('requestProperties', requestProperties);
   const url = new URL(request.url);
   const urlSearchParams = new URLSearchParams(url.search);
   const search = urlSearchParams.get("search");
 
+  const settingType = getSettingsPath(request.url);
+  // Handle settings
+  if (settingType) {
+    return getSettings(settingType);
+  }
+
   const client = new Client(env.CLOUD_NAME, env.KEY, env.SECRET);
-  const response = await client.searchAssets(search);
-  console.log("response", "\n", JSON.stringify(response, null, 4), "\n");
-  return mapAssetToVevAsset(response.resources);
+  const response = await client.searchAssets(search, requestProperties.assetType);
+  return mapAssetToVevAsset(response.resources, requestProperties.selfHostAssets);
 }
 
 registerVevPlugin({
