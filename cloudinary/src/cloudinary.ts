@@ -31,7 +31,7 @@ function mapAssetToVevAsset(
       case "image":
         return {
           id: resource.asset_id,
-          url: resource.url,
+          url: resource.secure_url,
           filename: resource.filename,
           mimeType: getMimeType(resource),
           dimension: { width: resource.width, height: resource.height },
@@ -40,7 +40,7 @@ function mapAssetToVevAsset(
       case "video":
         return {
           id: resource.asset_id,
-          url: resource.url,
+          url: resource.secure_url,
           filename: resource.filename,
           mimeType: getMimeType(resource),
           duration: resource.duration,
@@ -50,7 +50,7 @@ function mapAssetToVevAsset(
       case "raw":
         return {
           id: resource.asset_id,
-          url: resource.url,
+          url: resource.secure_url,
           filename: resource.filename,
           mimeType: getMimeType(resource),
           selfHosted: !!selfHostAssets,
