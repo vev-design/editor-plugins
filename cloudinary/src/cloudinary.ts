@@ -11,8 +11,9 @@ import { Resource } from "./types";
 import {
   getPropertiesFromRequest,
   getSettings,
-  getSettingsPath,
+  getPath,
 } from "./settings";
+import { getMetaFields, MetaFields } from './metaFields';
 
 function getMimeType(resource: Resource): string {
   if (resource.resource_type !== "raw") {
@@ -63,20 +64,24 @@ async function handler(
   request: Request,
   env: Record<string, string>,
   kv: EditorPluginKv
-): Promise<ProjectAsset[]> {
+): Promise<ProjectAsset[] | MetaFields> {
   const requestProperties = await getPropertiesFromRequest(request);
   console.log('requestProperties', requestProperties);
   const url = new URL(request.url);
   const urlSearchParams = new URLSearchParams(url.search);
   const search = urlSearchParams.get("search");
 
-  const settingType = getSettingsPath(request.url);
-  // Handle settings
-  if (settingType) {
+  const settingType = getPath(request.url);
+  const client = new Client(env.CLOUD_NAME, env.KEY, env.SECRET);
+
+  // Handle settings and meta fields
+  if(settingType === 'meta_fields') {
+    return getMetaFields(client)
+  }
+  else if (settingType) {
     return getSettings(settingType);
   }
 
-  const client = new Client(env.CLOUD_NAME, env.KEY, env.SECRET);
   const response = await client.searchAssets(search, requestProperties.assetType);
   return mapAssetToVevAsset(response.resources, requestProperties.selfHostAssets);
 }

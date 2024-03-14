@@ -1,14 +1,15 @@
 import { VevProps } from "@vev/utils";
 
-type settingsType = "global" | "workspace" | "team" | null;
-export function getSettingsPath(url: string): settingsType {
+type settingsType = "global" | "workspace" | "team" | "meta_fields" | null;
+export function getPath(url: string): settingsType {
   try {
     let settings = url.split("/").splice(-2)[0];
     let type = url.split("/").splice(-1)[0];
 
+
     if (
       settings === "settings" &&
-      (type === "global" || type === "workspace" || type === "team")
+      (type === "global" || type === "workspace" || type === "team" || type === "meta_fields")
     ) {
       return type;
     }
@@ -38,7 +39,10 @@ export async function getSettings(type: settingsType): Promise<any> {
   }
 }
 
-export type RequestProperties = { selfHostAssets?: boolean, assetType?: 'image' | 'video' | 'other' };
+export type RequestProperties = {
+  selfHostAssets?: boolean;
+  assetType?: "image" | "video" | "other";
+};
 
 export async function getPropertiesFromRequest(
   request: Request
