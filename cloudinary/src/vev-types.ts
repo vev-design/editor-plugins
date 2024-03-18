@@ -2,7 +2,7 @@ type ImageSizes = Record<number, string>;
 type MetaData = Record<string, string>;
 
 export interface BaseProjectAsset {
-  id: string;
+  key: string;
   mimeType: string; // https://www.iana.org/assignments/media-types/media-types.xhtml
   url: string;
   filename?: string;

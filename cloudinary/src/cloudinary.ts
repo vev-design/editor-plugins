@@ -31,7 +31,7 @@ function mapAssetToVevAsset(
     switch (resource.resource_type) {
       case "image":
         return {
-          id: resource.asset_id,
+          key: resource.asset_id,
           url: resource.secure_url,
           filename: resource.filename,
           mimeType: getMimeType(resource),
@@ -40,7 +40,7 @@ function mapAssetToVevAsset(
         } as ProjectImageAsset;
       case "video":
         return {
-          id: resource.asset_id,
+          key: resource.asset_id,
           url: resource.secure_url,
           filename: resource.filename,
           mimeType: getMimeType(resource),
@@ -50,7 +50,7 @@ function mapAssetToVevAsset(
         } as ProjectVideoAsset;
       case "raw":
         return {
-          id: resource.asset_id,
+          key: resource.asset_id,
           url: resource.secure_url,
           filename: resource.filename,
           mimeType: getMimeType(resource),
