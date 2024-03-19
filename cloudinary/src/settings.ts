@@ -41,13 +41,12 @@ export async function getSettings(type: settingsType): Promise<any> {
 
 export type RequestProperties = {
   selfHostAssets?: boolean;
-  assetType?: "image" | "video" | "other";
+  assetType?: "IMAGE" | "VIDEO" | "OTHER";
 };
 
 export async function getPropertiesFromRequest(
   request: Request
 ): Promise<RequestProperties> {
-  let body = null;
   try {
     return await request.json();
   } catch (e) {

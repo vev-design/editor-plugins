@@ -8,12 +8,8 @@ import {
   ProjectVideoAsset,
 } from "./vev-types";
 import { Resource } from "./types";
-import {
-  getPropertiesFromRequest,
-  getSettings,
-  getPath,
-} from "./settings";
-import { getMetaFields, MetaFields } from './metaFields';
+import { getPropertiesFromRequest, getSettings, getPath } from "./settings";
+import { getMetaFields, MetaFields } from "./metaFields";
 
 function getMimeType(resource: Resource): string {
   if (resource.resource_type !== "raw") {
@@ -24,7 +20,7 @@ function getMimeType(resource: Resource): string {
 }
 
 function mapAssetToVevAsset(
-  resources: Resource[],
+  resources: Resource[] = [],
   selfHostAssets?: boolean
 ): ProjectAsset[] {
   return resources.map((resource) => {
@@ -66,7 +62,6 @@ async function handler(
   kv: EditorPluginKv
 ): Promise<ProjectAsset[] | MetaFields> {
   const requestProperties = await getPropertiesFromRequest(request);
-  console.log('requestProperties', requestProperties);
   const url = new URL(request.url);
   const urlSearchParams = new URLSearchParams(url.search);
   const search = urlSearchParams.get("search");
@@ -75,15 +70,20 @@ async function handler(
   const client = new Client(env.CLOUD_NAME, env.KEY, env.SECRET);
 
   // Handle settings and meta fields
-  if(settingType === 'meta_fields') {
-    return getMetaFields(client)
-  }
-  else if (settingType) {
+  if (settingType === "meta_fields") {
+    return getMetaFields(client);
+  } else if (settingType) {
     return getSettings(settingType);
   }
 
-  const response = await client.searchAssets(search, requestProperties.assetType);
-  return mapAssetToVevAsset(response.resources, requestProperties.selfHostAssets);
+  const response = await client.searchAssets(
+    search,
+    requestProperties.assetType
+  );
+  return mapAssetToVevAsset(
+    response.resources,
+    requestProperties.selfHostAssets
+  );
 }
 
 registerVevPlugin({

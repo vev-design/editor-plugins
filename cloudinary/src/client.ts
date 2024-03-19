@@ -15,16 +15,20 @@ export class Client {
 
   async searchAssets(
     query: string,
-    resourceType?: "image" | "video" | "other"
+    resourceType?: "IMAGE" | "VIDEO" | "OTHER"
   ): Promise<SearchResponse> {
     let expression = query;
 
-    if (resourceType && resourceType != "other") {
-      expression = `resource_type:${resourceType} AND ${query}`;
-    }
+    if (resourceType) {
+      if (resourceType != "OTHER") {
+        expression = `resource_type:${resourceType.toLowerCase()}`;
+      } else {
+        expression = `resource_type:raw`;
+      }
 
-    if (resourceType && resourceType == "other") {
-      expression = `resource_type:raw AND ${query}`;
+      if (query && query !== "") {
+        expression += " AND ${query}";
+      }
     }
 
     const body = {
@@ -46,17 +50,19 @@ export class Client {
   }
 
   async getTags() {
-    const tags = await Promise.all(["image", "video", "raw"].map(async (resourceType) => {
-      const response = await fetch(`${this.cloudUrl}/tags/${resourceType}`, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        method: "GET",
-      });
-      return (await response.json()).tags as Promise<string[]>;
-    }));
+    const tags = await Promise.all(
+      ["image", "video", "raw"].map(async (resourceType) => {
+        const response = await fetch(`${this.cloudUrl}/tags/${resourceType}`, {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method: "GET",
+        });
+        return (await response.json()).tags as Promise<string[]>;
+      })
+    );
 
-    return tags.flatMap(value => value);
+    return tags.flatMap((value) => value);
   }
 }
