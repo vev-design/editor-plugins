@@ -59,12 +59,16 @@ async function handler(
     return {};
   }
 
+  if (requestProperties.filter) {
+    return [];
+  }
+
   const response = await fetch(
     `${API}/search/photos?query=${search}&content_filter=high&per_page=20`,
     {
       headers: {
         "Accept-Version": "v1",
-        "Authorization": `Client-ID ${env.API_KEY}`,
+        Authorization: `Client-ID ${env.API_KEY}`,
       },
     }
   );
