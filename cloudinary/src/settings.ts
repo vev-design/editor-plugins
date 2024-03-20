@@ -1,4 +1,5 @@
 import { VevProps } from "@vev/utils";
+import { MetaFields } from './metaFields';
 
 type settingsType = "global" | "workspace" | "team" | "meta_fields" | null;
 export function getPath(url: string): settingsType {
@@ -42,6 +43,7 @@ export async function getSettings(type: settingsType): Promise<any> {
 export type RequestProperties = {
   selfHostAssets?: boolean;
   assetType?: "IMAGE" | "VIDEO" | "OTHER";
+  filter?: Record<string, string>;
 };
 
 export async function getPropertiesFromRequest(

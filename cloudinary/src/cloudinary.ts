@@ -82,7 +82,8 @@ async function handler(
 
   const response = await client.searchAssets(
     search,
-    requestProperties.assetType
+    requestProperties.assetType,
+    requestProperties.filter,
   );
   return mapAssetToVevAsset(
     response.resources,

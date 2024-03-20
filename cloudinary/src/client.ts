@@ -15,8 +15,13 @@ export class Client {
 
   async searchAssets(
     query: string,
-    resourceType?: "IMAGE" | "VIDEO" | "OTHER"
+    resourceType?: "IMAGE" | "VIDEO" | "OTHER",
+    filter?: Record<string, string>
   ): Promise<SearchResponse> {
+    console.log('query', query);
+    console.log('resourceType', resourceType);
+    console.log('filter', filter);
+
     let expression = query;
 
     if (resourceType) {
@@ -31,11 +36,23 @@ export class Client {
       }
     }
 
+    if(filter && Object.keys(filter).length > 0) {
+      const filterExpression =  expression !== null && expression !== '' ? [expression] : [];
+
+      Object.keys(filter).forEach(key => {
+        filterExpression.push(`${key}=${filter[key]}`)
+      });
+      console.log('filterExpression', filterExpression);
+      expression = filterExpression.join(' AND ');
+    }
+
     const body = {
       expression,
       sort_by: [{ score: "desc" }],
       max_results: 50,
     };
+
+    console.log('body', body);
 
     const response = await fetch(`${this.cloudUrl}/resources/search`, {
       body: JSON.stringify(body),
