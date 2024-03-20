@@ -59,24 +59,17 @@ async function handler(
     return {};
   }
 
-
-  const headers = {
-    headers: {
-      "Accept-Version": "v1",
-      "Authorization": `Client-ID ${env.API_KEY}`,
-    },
-  };
-  const url2 = `${API}/search/photos?query=${search}&content_filter=high&per_page=20`;
-  console.log('headers', headers);
-  console.log('url2', url2);
-  console.log('env.API_KEY', env.API_KEY);
   const response = await fetch(
-    url2,
-    headers
+    `${API}/search/photos?query=${search}&content_filter=high&per_page=20`,
+    {
+      headers: {
+        "Accept-Version": "v1",
+        "Authorization": `Client-ID ${env.API_KEY}`,
+      },
+    }
   );
 
   const json = (await response.json()).results as Photo[];
-  console.log("json", json);
   return mapAssetToVevAsset(json);
 }
 
