@@ -10,6 +10,7 @@ import {
 import { Resource } from "./types";
 import { getPropertiesFromRequest, getSettings, getPath } from "./settings";
 import { getMetaFields, MetaFields } from "./metaFields";
+import { createThumbnail } from "./transforms";
 
 function getMimeType(resource: Resource): string {
   if (resource.resource_type !== "raw") {
@@ -33,6 +34,7 @@ function mapAssetToVevAsset(
           mimeType: getMimeType(resource),
           dimension: { width: resource.width, height: resource.height },
           selfHosted: !!selfHostAssets,
+          thumb: createThumbnail(resource.secure_url, 'IMAGE'),
         } as ProjectImageAsset;
       case "video":
         return {
@@ -42,6 +44,8 @@ function mapAssetToVevAsset(
           mimeType: getMimeType(resource),
           duration: resource.duration,
           dimension: { width: resource.width, height: resource.height },
+          videoSample: createThumbnail(resource.secure_url, 'VIDEO'),
+          videoThumbnail: createThumbnail(resource.secure_url, 'VIDEO_THUMB'),
           selfHosted: !!selfHostAssets,
         } as ProjectVideoAsset;
       case "raw":
