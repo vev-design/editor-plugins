@@ -19,7 +19,7 @@ function mapAssetToVevAsset(
       key: `${Date.now()}`,
       url: photo.url,
       filename: `AI | ${search}`,
-      mimeType: "image/jpg",
+      mimeType: "image/png",
       dimension: { width: 1024, height: 1024 },
       selfHosted: false,
       thumb: photo.url,
