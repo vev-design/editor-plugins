@@ -1,1 +1,1 @@
-# Cloudinary asset source editor plugin
+# Dalle-e asset source editor plugin
