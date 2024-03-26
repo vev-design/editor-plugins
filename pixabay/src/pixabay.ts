@@ -1,24 +1,45 @@
 import { registerVevPlugin } from "@vev/react";
 import { EditorPluginKv, EditorPluginType } from "@vev/utils";
-import { ProjectAsset, ProjectImageAsset } from "./vev-types";
+import {
+  ProjectAsset,
+  ProjectImageAsset,
+  ProjectVideoAsset,
+} from "./vev-types";
 import { getPath, getPropertiesFromRequest } from "./settings";
 
-const API = "https://pixabay.com/api";
+const API_IMAGE = "https://pixabay.com/api";
+const API_VIDEO = "https://pixabay.com/api/videos/";
 
 interface Photo {
   id: string;
+  pageURL: string;
   webformatURL: string;
   imageURL: string;
-  pageURL: string;
   imageWidth: number;
   imageHeight: number;
   description: string;
   user: string;
 }
 
+interface VideoType {
+  url: string;
+  width: number;
+  height: number;
+  thumbnail: string;
+}
+interface Video {
+  id: string;
+  pageURL: string;
+  videos: {
+    medium: VideoType;
+    small: VideoType;
+    tiny: VideoType;
+  };
+  user: string;
+}
 
-function mapAssetToVevAsset(photo: Photo): ProjectImageAsset {
-  const url = photo.pageURL.split('/');
+function mapImageAssetToVevAsset(photo: Photo): ProjectImageAsset {
+  const url = photo.pageURL.split("/");
 
   return {
     key: url[url.length - 2],
@@ -34,6 +55,30 @@ function mapAssetToVevAsset(photo: Photo): ProjectImageAsset {
       user: `@${photo.user}`,
     },
     selfHosted: false,
+  };
+}
+
+function mapVideoAssetToVevAsset(video: Video): ProjectVideoAsset {
+  const url = video.pageURL.split("/");
+
+  return {
+    key: url[url.length - 2],
+    url: video.videos.medium.url,
+    filename: `Pixabay | ${video.user}`,
+    mimeType: "video/mp4",
+    dimension: {
+      width: video.videos.medium.width,
+      height: video.videos.medium.height,
+    },
+    additionalSources: [],
+    metaData: {
+      width: `${video.videos.medium.width}`,
+      height: `${video.videos.medium.height}`,
+      user: `@${video.user}`,
+    },
+    videoSample: video.videos.tiny.url,
+    videoThumbnail: video.videos.tiny.thumbnail,
+    selfHosted: true,
   };
 }
 
@@ -62,32 +107,39 @@ async function handler(
     return [];
   }
 
-
   const params = new URLSearchParams();
-  params.set('key', env.API_KEY);
-  params.set('safesearch', 'true');
-  params.set('per_page', '15');
+  params.set("key", env.API_KEY);
+  params.set("safesearch", "true");
+  params.set("per_page", "15");
 
-  if(search && search !== '') {
-    params.set('q', encodeURIComponent(search));
+  if (search && search !== "") {
+    params.set("q", encodeURIComponent(search));
   }
 
-  const fetchuUrl = `${API}?${params.toString()}`;
-
-
-  const response = await fetch(
-    fetchuUrl,
-    {
+  let results: ProjectAsset[] = [];
+  if (!requestProperties.assetType || requestProperties.assetType === "IMAGE") {
+    const response = await fetch(`${API_IMAGE}?${params.toString()}`, {
       headers: {
         Accept: "application/json",
       },
-    }
-  );
+    });
+    const json = (await response.json()).hits as Photo[];
+    const projectImageAssets = json.map(mapImageAssetToVevAsset);
+    results.push(...projectImageAssets);
+  }
 
-  console.log('response', response);
+  if (!requestProperties.assetType || requestProperties.assetType === "VIDEO") {
+    const response = await fetch(`${API_VIDEO}?${params.toString()}`, {
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    const json = (await response.json()).hits as Video[];
+    const projectVideoAssets = json.map(mapVideoAssetToVevAsset);
+    results.push(...projectVideoAssets);
+  }
 
-  const json = (await response.json()).hits as Photo[];
-  return json.map(mapAssetToVevAsset);
+  return results;
 }
 
 registerVevPlugin({
