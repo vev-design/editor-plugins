@@ -1,10 +1,5 @@
 import { registerVevPlugin } from "@vev/react";
-import { EditorPluginKv, EditorPluginType } from "@vev/utils";
-import {
-  ProjectAsset,
-  ProjectImageAsset,
-  ProjectVideoAsset,
-} from "./vev-types";
+import { EditorPluginKv, EditorPluginType, ProjectAsset, ProjectImageAsset, ProjectVideoAsset } from "@vev/utils";
 import { getPath, getPropertiesFromRequest } from "./settings";
 
 const API_IMAGE = "https://pixabay.com/api";
