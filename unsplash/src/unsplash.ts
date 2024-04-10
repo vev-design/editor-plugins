@@ -1,6 +1,10 @@
 import { registerVevPlugin } from "@vev/react";
-import { EditorPluginKv, EditorPluginType } from "@vev/utils";
-import { ProjectAsset, ProjectImageAsset } from "./vev-types";
+import {
+  EditorPluginKv,
+  EditorPluginType,
+  ProjectAsset,
+  ProjectImageAsset,
+} from "@vev/utils";
 import { getPath, getPropertiesFromRequest } from "./settings";
 
 const API = "https://api.unsplash.com/";
@@ -64,7 +68,7 @@ async function handler(
   }
 
   const response = await fetch(
-    `${API}/search/photos?query=${search}&content_filter=high&per_page=30`,
+    `${API}/search/photos?query=${search}&content_filter=high&per_page=20`,
     {
       headers: {
         "Accept-Version": "v1",

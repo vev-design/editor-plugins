@@ -40,19 +40,19 @@
   resolved "https://registry.yarnpkg.com/@types/scheduler/-/scheduler-0.16.8.tgz#ce5ace04cfeabe7ef87c0091e50752e36707deff"
   integrity sha512-WZLiwShhwLRmeV6zH+GkbOFT6Z6VklCItrDioxUnv+u4Ll+8vKeFySoFyK/0ctcRpOmwAicELfmys1sDc/Rw+A==
 
-"@vev/react@^0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@vev/react/-/react-0.1.5.tgz#5f35092e3d51171a5e9af010b00a1232808e3e10"
-  integrity sha512-6kT7nOeF0BV070YvPP35x4xob9xMF1i23SigPJvOul5QHLnzHpSMkrEWR0jsLb/XnwLEhr6uVpSRzV5zkvWIiQ==
+"@vev/react@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@vev/react/-/react-0.1.6.tgz#fce00f57ac08a3a1076dc913c9927f316403e3b0"
+  integrity sha512-p6Jl7yzKrazT2GAHWhk2BaMDaJUhsWQ0qGUEvtdixsZbHtfRsEMZh5bggG6agW8wCEaiSBcOllUbpjIwpOUtYg==
   dependencies:
-    "@vev/utils" "1.2.2"
+    "@vev/utils" "1.2.3"
     animejs "^3.0.1"
     stringify-entities "^4.0.3"
 
-"@vev/utils@1.2.2":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@vev/utils/-/utils-1.2.2.tgz#d31f47e632f71a6b59aa3f838669c3e66622bb49"
-  integrity sha512-xd1e8DKZ9zD1ungF6ABiD9pFUu3NjgcMRpdJa6rhpty7i3WvEy5ccl/BR4h50scPT1Uv1RDtgu7zbaKjXaKK5w==
+"@vev/utils@1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@vev/utils/-/utils-1.2.3.tgz#0020aa3f8054caf1afda81d1292d68133c6f7700"
+  integrity sha512-ErP4DWh+hP5/ozQfiQAJrQXSJ71vY6uBGlSN/PxJZXUHRspBz4nOLupRTklvERMuQFjD6+g9D+oAX0WhuFHCZQ==
   dependencies:
     csstype "^3.1.3"
     nanoid "^3.2.0"

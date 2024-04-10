@@ -106,7 +106,7 @@ async function handler(
   const params = new URLSearchParams();
   params.set("key", env.API_KEY);
   params.set("safesearch", "true");
-  params.set("per_page", "30");
+  params.set("per_page", "20");
 
   if (search && search !== "") {
     params.set("q", search);
