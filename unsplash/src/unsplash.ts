@@ -64,7 +64,7 @@ async function handler(
   }
 
   const response = await fetch(
-    `${API}/search/photos?query=${search}&content_filter=high&per_page=15`,
+    `${API}/search/photos?query=${search}&content_filter=high&per_page=30`,
     {
       headers: {
         "Accept-Version": "v1",

@@ -86,6 +86,7 @@ async function handler(
 ): Promise<ProjectAsset[] | MetaFields> {
   const requestProperties = await getPropertiesFromRequest(request);
   const url = new URL(request.url);
+
   const urlSearchParams = new URLSearchParams(url.search);
   const search = urlSearchParams.get("search");
 
@@ -105,10 +106,10 @@ async function handler(
   const params = new URLSearchParams();
   params.set("key", env.API_KEY);
   params.set("safesearch", "true");
-  params.set("per_page", "15");
+  params.set("per_page", "30");
 
   if (search && search !== "") {
-    params.set("q", encodeURIComponent(search));
+    params.set("q", search);
   }
 
   let results: ProjectAsset[] = [];
