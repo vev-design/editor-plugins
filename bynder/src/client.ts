@@ -7,6 +7,7 @@ import {
 } from './types';
 import { PROPERTY_PREFIX } from "./constants";
 import { EditorPluginKv, EditorPluginKvKey } from '@vev/utils';
+import { RequestProperties } from './settings';
 
 interface AuthResponse {
   token_type: string;
@@ -100,7 +101,7 @@ export class BynderClient {
   }
 
   public async getAllMetaProperties(
-    type: ("image" | "video")[]
+    type: ("image" | "video" | "other")[]
   ): Promise<BynderMetaProperties> {
     console.log("Getting meta properties");
     const accessToken = await this.getAccessToken();
@@ -131,7 +132,7 @@ export class BynderClient {
     }
   }
 
-  public async syncMetaProperties(type: ("image" | "video")[]) {
+  public async syncMetaProperties(type: ("image" | "video" | "other")[]) {
     const kvRes = await this.kv.get<number>([KVKeys.metaPropertiesTimestamp]);
     const lastSync = kvRes.value || 0;
 
@@ -176,8 +177,8 @@ export class BynderClient {
 
   public async searchAssets(
     query: string,
-    filter: Filter | null,
-    type: ("image" | "video")[]
+    filter: RequestProperties | undefined,
+    type: ("image" | "video" | "other")[]
   ): Promise<BynderAPIAsset[]> {
     console.log(`Searching assets: "${query}" ${type}`);
     const accessToken = await this.getAccessToken();
@@ -190,11 +191,14 @@ export class BynderClient {
       params.set('keyword', query);
     }
 
-    if(filter) {
-      Object.keys(filter.property_filter).forEach((metaprop) => {
-        const values = filter.property_filter[metaprop];
-        if(values.length !== 0) {
-          params.set(`${PROPERTY_PREFIX}${metaprop}`, values.join(','));
+    if(filter && filter.filter) {
+      filter.filter.forEach(filterField => {
+        const paramValue = `${PROPERTY_PREFIX}${filterField.field}`;
+        if(params.has(paramValue)) {
+          const prevValue = params.get(paramValue);
+          params.set(paramValue, `${prevValue},${filterField.value}`);
+        } else {
+          params.set(paramValue, filterField.value);
         }
       });
     }

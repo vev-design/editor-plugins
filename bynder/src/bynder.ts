@@ -1,82 +1,29 @@
 import { registerVevPlugin } from "@vev/react";
 import { BynderClient } from "./client.js";
-import { BynderAPIAsset } from "./types";
-import { PROPERTY_PREFIX } from "./constants";
-import { getSettings, getSettingsPath } from "./settings";
 import {
-  EditorPluginType,
+  getMetaFields,
+  getPropertiesFromRequest,
+  getSettings,
+  getSettingsPath,
+} from "./settings";
+import {
+  EditorPluginAssetSourceFilterFields,
   EditorPluginKv,
-  EditorPluginAssetSourceResult,
   EditorPluginSettings,
+  EditorPluginType,
+  ProjectAsset,
 } from "@vev/utils";
-
-/**
- *     "property_copyright": "Syngenta Crop Protection AG",
- *     "property_subterritory": [
- *       "canada"
- *     ],
- */
-async function mapAssetToVevAsset(
-  asset: BynderAPIAsset,
-  client: BynderClient
-): Promise<{
-  key: string;
-  name: string;
-  url: string;
-  thumb: string;
-  metadata?: Record<string, string | number>;
-}> {
-  const metaData: Record<string, string> = {};
-  await Promise.all(
-    Object.keys(asset).map(async (key) => {
-      if (key.startsWith(PROPERTY_PREFIX)) {
-        const metaProperty = await client.getMetaProperty([key]);
-
-        if (!metaProperty) {
-          console.error(`Missing metaproperty for ${key}`);
-        } else {
-          if (Array.isArray(asset[key])) {
-            const value = metaProperty.options[asset[key][0]].label;
-            if (value) metaData[metaProperty.label] = value;
-          } else if (typeof asset[key] === "object") {
-            const value = metaProperty.options[asset[key]].label;
-            if (value) metaData[metaProperty.label] = value;
-          } else {
-            const value = asset[key];
-            if (value) metaData[metaProperty.label] = asset[key];
-          }
-        }
-      }
-    })
-  );
-
-  return {
-    key: asset.id,
-    name: asset.name,
-    url: asset.thumbnails.transformBaseUrl,
-    thumb: asset.thumbnails.thul,
-    metadata: {
-      description: asset.description,
-      width: asset.width,
-      height: asset.height,
-      link: asset.transformBaseUrl,
-      ...metaData,
-    },
-  };
-}
+import { mapAssetToVevAsset } from "./asset-mappers";
 
 async function handler(
   request: Request,
   env: Record<string, string>,
   kv: EditorPluginKv
-): Promise<EditorPluginAssetSourceResult | EditorPluginSettings> {
-  let body = null;
-  try {
-    body = await request.json();
-  } catch (e) {
-    console.log(e);
-    console.log("No request body");
-  }
+): Promise<
+  ProjectAsset[] | EditorPluginSettings | EditorPluginAssetSourceFilterFields
+> {
+  const requestProperties = await getPropertiesFromRequest(request);
+  const assetType = requestProperties.assetType;
 
   const settingType = getSettingsPath(request.url);
 
@@ -88,8 +35,10 @@ async function handler(
   );
 
   // Handle settings
-  if (settingType) {
-    return getSettings(settingType, client, ["image"]);
+  if (settingType === "meta_fields") {
+    return getMetaFields(client, [assetType]);
+  } else if (settingType) {
+    return getSettings(settingType, client, [assetType]);
   }
 
   const url = new URL(request.url);
@@ -97,17 +46,15 @@ async function handler(
   const search = urlSearchParams.get("search");
 
   await client.syncMetaProperties(["image"]);
-  const results = await client.searchAssets(search, body, ["image"]);
-
-  const images = await Promise.all(
+  const results = await client.searchAssets(search, requestProperties, [
+    assetType,
+  ]);
+  console.log("results", results);
+  return await Promise.all(
     results.map(async (result) => {
       return await mapAssetToVevAsset(result, client);
     })
   );
-
-  return {
-    images,
-  };
 }
 
 registerVevPlugin({

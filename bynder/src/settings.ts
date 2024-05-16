@@ -1,7 +1,14 @@
 import { BynderClient } from "./client";
-import { VevProps } from "@vev/utils";
+import { VevProps } from '@vev/utils';
 
-type settingsType = "global" | "workspace" | "team" | null;
+type settingsType = "global" | "workspace" | "team" | "meta_fields" | null;
+
+export type EditorPluginAssetSourceFilterField = {
+  label: string;
+  value: string;
+  fields: { label: string; value: string }[];
+};
+export type EditorPluginAssetSourceFilterFields = EditorPluginAssetSourceFilterField[];
 
 export function getSettingsPath(url: string): settingsType {
   try {
@@ -10,7 +17,10 @@ export function getSettingsPath(url: string): settingsType {
 
     if (
       settings === "settings" &&
-      (type === "global" || type === "workspace" || type === "team")
+      (type === "global" ||
+        type === "workspace" ||
+        type === "team" ||
+        type === "meta_fields")
     ) {
       return type;
     }
@@ -21,10 +31,36 @@ export function getSettingsPath(url: string): settingsType {
   }
 }
 
+export async function getMetaFields(
+  client: BynderClient,
+  assetType: ("image" | "video" | "other")[]
+): Promise<EditorPluginAssetSourceFilterFields> {
+  const metaProps: EditorPluginAssetSourceFilterFields = [];
+  const allMetaProperties = await client.getAllMetaProperties(assetType);
+
+  Object.keys(allMetaProperties).forEach(
+    (key) => {
+      const metaProperty = allMetaProperties[key];
+      metaProps.push({
+        label: metaProperty.label,
+        value: metaProperty.name,
+        fields: metaProperty.options.map((option) => {
+          return {
+            label: option.label,
+            value: option.name
+          };
+        })
+      })
+    }
+  );
+
+  return metaProps;
+}
+
 export async function getSettings(
   type: settingsType,
   client: BynderClient,
-  assetType: ("image" | "video")[]
+  assetType: ("image" | "video" | "other")[]
 ): Promise<any> {
   switch (type) {
     case "global":
@@ -38,7 +74,7 @@ export async function getSettings(
 
 async function getSettingsForm(
   client: BynderClient,
-  assetType: ("image" | "video")[]
+  assetType: ("image" | "video" | "other")[]
 ): Promise<{ form: VevProps[] }> {
   const allMetaProperties = await client.getAllMetaProperties(assetType);
 
@@ -66,11 +102,30 @@ async function getSettingsForm(
   return {
     form: [
       {
-        type: 'object',
-        name: 'property_filter',
-        title: 'Filter on meta data',
-        fields: [...metaPropItems]
-      }
+        type: "object",
+        name: "property_filter",
+        title: "Filter on meta data",
+        fields: [...metaPropItems],
+      },
     ],
   };
+}
+
+export type RequestProperties = {
+  assetType?: "image" | "video" | "other";
+  filter?: { field: string; value: string }[];
+};
+
+export async function getPropertiesFromRequest(
+  request: Request
+): Promise<RequestProperties> {
+  try {
+    const properties = await request.json();
+    properties.assetType = properties.assetType.toLowerCase();
+    return properties as RequestProperties;
+  } catch (e) {
+    console.log(e);
+    console.log("No request body");
+    return {};
+  }
 }

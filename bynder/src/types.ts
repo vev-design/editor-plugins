@@ -1,4 +1,5 @@
 export interface BynderAPIAsset {
+  videoPreviewURLs: string[];
   description: string;
   id: string;
   copyright: string;
