@@ -107,7 +107,7 @@ export async function mapAssetToVevVideoAsset(
     filename: asset.name,
     url: asset.videoPreviewURLs[1] || asset.videoPreviewURLs[0],
     additionalSources: [],
-    videoThumbnail: asset.thumbnails.thul,
+    videoThumbnail: asset.thumbnails.webimage || asset.thumbnails.thul,
     dimension: { width: asset.width, height: asset.height },
     mimeType: `video/${asset.extension[0]}`,
     metaData: {
