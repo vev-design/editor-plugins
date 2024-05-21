@@ -81,12 +81,13 @@ async function getSettingsForm(
   const metaPropItems: VevProps[] = Object.keys(allMetaProperties).map(
     (key) => {
       const metaProperty = allMetaProperties[key];
+      metaProperty.options.unshift({label: ' ', name: null})
       return {
         name: metaProperty.name,
         title: metaProperty.label,
         type: "select",
         options: {
-          multiselect: true,
+          multiselect: false,
           display: "autocomplete",
           items: metaProperty.options.map((option) => {
             return {
@@ -114,6 +115,7 @@ async function getSettingsForm(
 export type RequestProperties = {
   assetType?: "image" | "video" | "other";
   filter?: { field: string; value: string }[];
+  property_filter?: Record<string, string | null>;
 };
 
 export async function getPropertiesFromRequest(

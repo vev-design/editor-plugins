@@ -203,9 +203,21 @@ export class BynderClient {
       });
     }
 
+    if(filter && filter.property_filter) {
+      Object.keys(filter.property_filter).forEach((prop) => {
+        const paramValue = `${PROPERTY_PREFIX}${prop}`;
+        const propValue = filter.property_filter[prop];
+        if(propValue) {
+          params.set(paramValue, propValue)
+        }
+      });
+    }
+
+    console.log('params', params.toString());
+
     const url = `https://${this.bynderDomain}/api/v4/media?${params.toString()}`;
 
-    console.log(url);
+    console.log('url', url);
 
     const response = await fetch(url, {
       headers: {
