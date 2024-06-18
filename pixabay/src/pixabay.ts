@@ -119,9 +119,11 @@ async function handler(
         Accept: "application/json",
       },
     });
-    const json = (await response.json()).hits as Photo[];
-    const projectImageAssets = json.map(mapImageAssetToVevAsset);
-    results.push(...projectImageAssets);
+    if(response.ok) {
+      const json = (await response.json()).hits as Photo[];
+      const projectImageAssets = json.map(mapImageAssetToVevAsset);
+      results.push(...projectImageAssets);
+    }
   }
 
   if (!requestProperties.assetType || requestProperties.assetType === "VIDEO") {
@@ -130,9 +132,11 @@ async function handler(
         Accept: "application/json",
       },
     });
-    const json = (await response.json()).hits as Video[];
-    const projectVideoAssets = json.map(mapVideoAssetToVevAsset);
-    results.push(...projectVideoAssets);
+    if(response.ok) {
+      const json = (await response.json()).hits as Video[];
+      const projectVideoAssets = json.map(mapVideoAssetToVevAsset);
+      results.push(...projectVideoAssets);
+    }
   }
 
   return results;
