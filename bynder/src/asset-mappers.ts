@@ -31,19 +31,24 @@ export async function mapAssetToVevImageAsset(
       if (key.startsWith(PROPERTY_PREFIX)) {
         const metaProperty = await client.getMetaProperty([key]);
 
-        if (!metaProperty) {
-          console.error(`Missing meta property for ${key}`);
-        } else {
-          if (Array.isArray(asset[key])) {
-            const value = metaProperty.options[asset[key][0]].label;
-            if (value) metaData[metaProperty.label] = value;
-          } else if (typeof asset[key] === "object") {
-            const value = metaProperty.options[asset[key]].label;
-            if (value) metaData[metaProperty.label] = value;
+        try {
+          if (!metaProperty) {
+            console.error(`Missing meta property for ${key}`);
           } else {
-            const value = asset[key];
-            if (value) metaData[metaProperty.label] = asset[key];
+            if (Array.isArray(asset[key])) {
+              const value = metaProperty.options[asset[key][0]]?.label;
+              if (value) metaData[metaProperty.label] = value;
+            } else if (typeof asset[key] === "object") {
+              const value = metaProperty.options[asset[key]]?.label;
+              if (value) metaData[metaProperty.label] = value;
+            } else {
+              const value = asset[key];
+              if (value) metaData[metaProperty.label] = asset[key];
+            }
           }
+        } catch (e) {
+          console.error(`Could not not map meta property ${key}`);
+          console.error(e);
         }
       }
     })
