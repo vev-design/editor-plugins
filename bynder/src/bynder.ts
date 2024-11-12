@@ -49,7 +49,7 @@ async function handler(
   const results = await client.searchAssets(search, requestProperties, [
     assetType,
   ]);
-  console.log("results", results);
+
   return await Promise.all(
     results.map(async (result) => {
       return await mapAssetToVevAsset(result, client);

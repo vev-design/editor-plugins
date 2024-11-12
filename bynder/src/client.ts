@@ -30,7 +30,7 @@ export class BynderClient {
   private readonly clientId: string;
   private readonly clientSecret: string;
   private readonly bynderDomain: string;
-  private readonly metaPropertyCache: Record<string, KVBynderMetaProperty>;
+  private metaPropertyCache: Record<string, KVBynderMetaProperty>;
   private newTokenRetries = AUTH_RETRIES;
   private kv: EditorPluginKv;
 
@@ -133,11 +133,7 @@ export class BynderClient {
   }
 
   public async syncMetaProperties(type: ("image" | "video" | "other")[]) {
-    const kvRes = await this.kv.get<number>([KVKeys.metaPropertiesTimestamp]);
-    const lastSync = kvRes.value || 0;
-
-    if (lastSync < Date.now() - oneDay) {
-      console.log("Updating stale metaproperties");
+      console.log("Fetching metaproperties");
       const bynderMetaProperties = await this.getAllMetaProperties(type);
 
       const kvPayload: KVBynderMetaProperties = {};
@@ -147,31 +143,14 @@ export class BynderClient {
           this.cleanMetaProperties(bynderMetaProperties[metapropKey]);
       });
 
-      await Promise.all(
-        Object.keys(kvPayload).map(async (key) => {
-          try {
-            await this.kv.set([KVKeys.metaproperties, key], kvPayload[key]);
-          } catch (e) {
-            console.error(`Meta property ${key} to big for kv`);
-          }
-        })
-      );
-
-      await this.kv.set([KVKeys.metaPropertiesTimestamp], Date.now());
-    }
-
-    console.log("Metaproperties up to date");
+    this.metaPropertyCache = kvPayload;
   }
 
   public async getMetaProperty(key: EditorPluginKvKey): Promise<KVBynderMetaProperty> {
     if (this.metaPropertyCache[key.join()]) {
       return this.metaPropertyCache[key.join()];
     } else {
-      const kvValue = (
-        await this.kv.get<KVBynderMetaProperty>([KVKeys.metaproperties, ...key])
-      ).value;
-      this.metaPropertyCache[key.join()] = kvValue;
-      return kvValue;
+      console.warn(`Could not get metaproperty ${key}`)
     }
   }
 
