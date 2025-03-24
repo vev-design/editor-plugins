@@ -73,7 +73,7 @@ function mapVideoAssetToVevAsset(video: Video): ProjectVideoAsset {
     },
     videoSample: video.videos.tiny.url,
     videoThumbnail: video.videos.tiny.thumbnail,
-    selfHosted: true,
+    selfHosted: false,
   };
 }
 
