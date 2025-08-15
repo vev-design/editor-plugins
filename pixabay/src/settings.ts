@@ -39,20 +39,23 @@ export async function getSettings(type: settingsType): Promise<any> {
   }
 }
 
+
 export type RequestProperties = {
-  selfHostAssets?: boolean;
   assetType?: "IMAGE" | "VIDEO" | "OTHER";
-  filter?: Record<string, string>;
+  filter?: { field: string; value: string }[];
+  property_filter?: Record<string, string | null>;
 };
 
 export async function getPropertiesFromRequest(
   request: Request
 ): Promise<RequestProperties> {
   try {
-    return await request.json();
+    const properties = await request.json();
+    return properties as RequestProperties;
   } catch (e) {
     console.log(e);
     console.log("No request body");
     return {};
   }
 }
+

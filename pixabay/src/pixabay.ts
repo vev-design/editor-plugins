@@ -1,5 +1,12 @@
 import { registerVevPlugin } from "@vev/react";
-import { EditorPluginKv, EditorPluginType, ProjectAsset, ProjectImageAsset, ProjectVideoAsset } from "@vev/utils";
+import {
+  EditorPluginKv,
+  EditorPluginSettings,
+  EditorPluginType,
+  ProjectAsset,
+  ProjectImageAsset,
+  ProjectVideoAsset,
+} from "@vev/utils";
 import { getPath, getPropertiesFromRequest } from "./settings";
 
 const API_IMAGE = "https://pixabay.com/api";
@@ -79,12 +86,62 @@ function mapVideoAssetToVevAsset(video: Video): ProjectVideoAsset {
 
 export type MetaFields = Record<string, string[]>;
 
+export type EditorPluginAssetSourceFilterField = {
+  label: string;
+  value: string;
+  fields: { label: string; value: string }[];
+};
+export type EditorPluginAssetSourceFilterFields =
+  EditorPluginAssetSourceFilterField[];
+
+function getMetaFields(): EditorPluginAssetSourceFilterFields {
+  return [
+    {
+      label: "Orientation",
+      value: "orientation",
+      fields: ["horizontal", "vertical", "all"].map((value) => {
+        return { label: value, value: value };
+      }),
+    },
+    {
+      label: "Category",
+      value: "category",
+      fields: [
+        "backgrounds",
+        "fashion",
+        "nature",
+        "science",
+        "education",
+        "feelings",
+        "health",
+        "people",
+        "religion",
+        "places",
+        "animals",
+        "industry",
+        "computer",
+        "food",
+        "sports",
+        "transportation",
+        "travel",
+        "buildings",
+        "business",
+        "music",
+      ].map((value) => {
+        return { label: value, value: value };
+      }),
+    },
+  ];
+}
+
 async function handler(
   request: Request,
   env: Record<string, string>,
   kv: EditorPluginKv
-): Promise<ProjectAsset[] | MetaFields> {
+): Promise<ProjectAsset[] | EditorPluginAssetSourceFilterFields | EditorPluginSettings> {
+  console.log('request.url', request.url);
   const requestProperties = await getPropertiesFromRequest(request);
+  console.log('requestProperties', requestProperties);
   const url = new URL(request.url);
 
   const urlSearchParams = new URLSearchParams(url.search);
@@ -94,12 +151,8 @@ async function handler(
 
   // Handle settings and meta fields
   if (settingType === "meta_fields") {
-    return {};
+    return getMetaFields();
   } else if (settingType) {
-    return {};
-  }
-
-  if (requestProperties.filter) {
     return [];
   }
 
@@ -107,6 +160,12 @@ async function handler(
   params.set("key", env.API_KEY);
   params.set("safesearch", "true");
   params.set("per_page", "20");
+
+  if (requestProperties.filter) {
+    requestProperties.filter.map(filter => {
+      params.set(filter.field, filter.value)
+    })
+  }
 
   if (search && search !== "") {
     params.set("q", search);
@@ -119,8 +178,9 @@ async function handler(
         Accept: "application/json",
       },
     });
-    if(response.ok) {
+    if (response.ok) {
       const json = (await response.json()).hits as Photo[];
+      console.log('json', json);
       const projectImageAssets = json.map(mapImageAssetToVevAsset);
       results.push(...projectImageAssets);
     }
@@ -132,8 +192,9 @@ async function handler(
         Accept: "application/json",
       },
     });
-    if(response.ok) {
+    if (response.ok) {
       const json = (await response.json()).hits as Video[];
+      console.log('json', json);
       const projectVideoAssets = json.map(mapVideoAssetToVevAsset);
       results.push(...projectVideoAssets);
     }

@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/react": "latest",
+    "@types/react": "^19.1.10",
     "prettier": "2.7.0",
     "typescript-plugin-css-modules": "^5.0.1"
   },
