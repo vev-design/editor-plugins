@@ -1,5 +1,10 @@
 import { registerVevPlugin } from "@vev/react";
-import { EditorPluginKv, EditorPluginType, ProjectAsset, ProjectImageAsset, ProjectVideoAsset } from "@vev/utils";
+import {
+  EditorPluginType,
+  ProjectAsset,
+  ProjectImageAsset,
+  ProjectVideoAsset,
+} from "@vev/utils";
 import { getPath, getPropertiesFromRequest } from "./settings";
 
 const API_IMAGE = "https://pixabay.com/api";
@@ -49,6 +54,7 @@ function mapImageAssetToVevAsset(photo: Photo): ProjectImageAsset {
       height: `${photo.imageHeight}`,
       user: `@${photo.user}`,
     },
+    updated: Date.now(),
     selfHosted: false,
   };
 }
@@ -73,7 +79,8 @@ function mapVideoAssetToVevAsset(video: Video): ProjectVideoAsset {
     },
     videoSample: video.videos.tiny.url,
     videoThumbnail: video.videos.tiny.thumbnail,
-    selfHosted: false,
+    selfHosted: true,
+    updated: Date.now(),
   };
 }
 
@@ -82,7 +89,6 @@ export type MetaFields = Record<string, string[]>;
 async function handler(
   request: Request,
   env: Record<string, string>,
-  kv: EditorPluginKv
 ): Promise<ProjectAsset[] | MetaFields> {
   const requestProperties = await getPropertiesFromRequest(request);
   const url = new URL(request.url);
