@@ -132,7 +132,7 @@ async function handler(
     }
   }
 
-  if (!requestProperties.assetType || requestProperties.assetType === "VIDEO") {
+  if (requestProperties.assetType === "VIDEO") {
     const response = await fetch(`${API_VIDEO}?${params.toString()}`, {
       headers: {
         Accept: "application/json",
