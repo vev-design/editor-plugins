@@ -48,7 +48,7 @@ interface Video {
 
 function mapImageAssetToVevAsset(photo: Photo): ProjectImageAsset {
   return {
-    key: photo.id,
+    key: `${photo.id}`,
     url: photo.src.original,
     filename: `Pexels | ${photo.photographer}`,
     mimeType: "image/png",
