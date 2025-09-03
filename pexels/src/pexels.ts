@@ -69,7 +69,7 @@ function mapVideoAssetToVevAsset(video: Video): ProjectVideoAsset {
   const videoType = video.video_files.find(value => value.quality === "hd");
   const videoTypeSmall = video.video_files.find(value => value.quality === "sd");
   return {
-    key: video.id,
+    key: `${video.id}`,
     url: videoType.link,
     filename: `Pexels | ${video.user.name}`,
     mimeType: videoType.file_type,
