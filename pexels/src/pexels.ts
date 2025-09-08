@@ -142,6 +142,7 @@ async function handler(
   }
 
   if (requestProperties.assetType === "VIDEO") {
+    params.set("per_page", "5");
     const endpoint = search && search !== "" ? API_VIDEO : API_VIDEO_CURATED;
     const response = await fetch(`${endpoint}?${params.toString()}`, {
       headers: {

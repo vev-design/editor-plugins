@@ -133,6 +133,7 @@ async function handler(
   }
 
   if (requestProperties.assetType === "VIDEO") {
+    params.set("per_page", "5");
     const response = await fetch(`${API_VIDEO}?${params.toString()}`, {
       headers: {
         Accept: "application/json",
