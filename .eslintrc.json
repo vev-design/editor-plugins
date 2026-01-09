@@ -1,0 +1,109 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "plugins": ["react", "prettier", "@typescript-eslint"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "printWidth": 100,
+        "trailingComma": "all",
+        "singleQuote": true,
+        "endOfLine": "auto"
+      }
+    ],
+    "jsx-quotes": "error",
+    "space-in-parens": "warn",
+    "array-bracket-spacing": "warn",
+    "comma-spacing": "error",
+    "camelcase": "warn",
+    "eqeqeq": "error",
+    "no-var": "error",
+    "no-dupe-class-members": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "react/no-deprecated": "warn",
+    "react/prop-types": "off",
+    "react/no-unescaped-entities": "off",
+    "object-shorthand": "warn",
+    "no-array-constructor": "error",
+    "prefer-destructuring": "warn",
+    "prefer-rest-params": "warn",
+    "no-param-reassign": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "space-before-blocks": "error",
+    "prefer-arrow-callback": "warn",
+    "no-duplicate-imports": "warn",
+    "dot-notation": "error",
+    "no-multi-assign": "warn",
+    "no-unneeded-ternary": "error",
+    "brace-style": "error",
+    "no-else-return": "warn",
+    "linebreak-style": ["error", "unix"],
+    "padding-line-between-statements": [
+      "error",
+      {
+        // Blank lines after import
+        "blankLine": "always",
+        "prev": "import",
+        "next": "*"
+      },
+      {
+        // Whatever between imports
+        "blankLine": "any",
+        "prev": "import",
+        "next": "import"
+      },
+      {
+        // Always before class, function
+        "blankLine": "always",
+        "prev": "*",
+        "next": ["class", "function"]
+      }
+    ],
+    "space-infix-ops": "error",
+    "template-curly-spacing": "error",
+    "no-whitespace-before-property": "warn",
+    "spaced-comment": [
+      "warn",
+      "always",
+      {
+        "markers": ["/"] // Allow for triple slash for tsd reference
+      }
+    ],
+    "object-curly-spacing": ["warn", "always"],
+    "padded-blocks": ["error", "never"],
+    "arrow-spacing": "warn",
+    "comma-style": "warn",
+    "eol-last": "error"
+  }
+}

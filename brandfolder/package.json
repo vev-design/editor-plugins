@@ -1,0 +1,19 @@
+{
+  "name": "bynder-editor-plugin",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "login": "vev login",
+    "init": "vev init",
+    "start": "vev start"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "2.7.0",
+    "typescript-plugin-css-modules": "^5.0.1"
+  },
+  "dependencies": {
+    "@vev/utils": "^1.2.15",
+    "@vev/react": "^0.3.3"
+  }
+}
