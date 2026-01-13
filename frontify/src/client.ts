@@ -55,7 +55,7 @@ query Libraries($brandId: ID!) {
     }) as { id: string; name: string }[];
   }
 
-  async searchAllAssetsInLibrary(libraryId: string, search: string) {
+  async searchAssetsInLibrary(libraryId: string, search: string) {
     const query = `
 query SearchInMediaLibrary($libraryId: ID!, $search: String!, $page: Int = 1, $limit: Int = 25) {
   library(id: $libraryId) {
@@ -94,7 +94,7 @@ query SearchInMediaLibrary($libraryId: ID!, $search: String!, $page: Int = 1, $l
 
     const results = await Promise.all(
       mediaLibraries.map(async (value) => {
-        return await this.searchAllAssetsInLibrary(value.id, search);
+        return await this.searchAssetsInLibrary(value.id, search);
       }),
     );
 

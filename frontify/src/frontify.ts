@@ -1,5 +1,5 @@
 import { registerVevPlugin } from '@vev/react';
-import { FrontifyClient } from './client';
+import { FrontifyAsset, FrontifyClient } from './client';
 import { getMetaFields, getPropertiesFromRequest, getSettings, getSettingsPath } from './settings';
 import {
   EditorPluginAssetSourceFilterFields,
@@ -37,7 +37,17 @@ async function handler(
   const urlSearchParams = new URLSearchParams(url.search);
   const search = urlSearchParams.get('search');
 
-  const results = await client.searchAllAssets(search || '');
+  const libraryFilter = requestProperties.filter.find((value) => {
+    return value.field === 'library';
+  });
+
+  let results: FrontifyAsset[] = [];
+
+  if (libraryFilter) {
+    results = await client.searchAssetsInLibrary(libraryFilter.value, search || '');
+  } else {
+    results = await client.searchAllAssets(search || '');
+  }
 
   return await Promise.all(
     results.map(async (item) => {
