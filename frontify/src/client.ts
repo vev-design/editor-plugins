@@ -102,7 +102,10 @@ query SearchInMediaLibrary($libraryId: ID!, $search: String!, $page: Int = 1, $l
   }
 
   private async query(query: string, variables: Record<string, any> = {}) {
-    const response = await fetch(`https://${this.domain}/graphql`, {
+    const domain = this.domain.startsWith('https://') ? this.domain : `https://${this.domain}`;
+    const url = `${domain}${domain.endsWith('/') ? 'graphql' : '/graphql'}`;
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
