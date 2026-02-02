@@ -42,8 +42,7 @@ async function handler(
   });
 
   let results: FrontifyAsset[] = [];
-
-  if (libraryFilter) {
+  if (libraryFilter && libraryFilter.value) {
     results = await client.searchAssetsInLibrary(libraryFilter.value, search || '');
   } else {
     results = await client.searchAllAssets(search || '');
