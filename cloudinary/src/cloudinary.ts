@@ -8,7 +8,7 @@ import {
   ProjectVideoAsset,
 } from "./vev-types";
 import { Resource } from "./types";
-import { getPropertiesFromRequest, getSettings, getPath } from "./settings";
+import { getPropertiesFromRequest, getSettings, getSettingsPath } from "./settings";
 import { getMetaFields, MetaFields } from "./metaFields";
 import { createThumbnail } from "./transforms";
 
@@ -70,7 +70,7 @@ async function handler(
   const urlSearchParams = new URLSearchParams(url.search);
   const search = urlSearchParams.get("search");
 
-  const settingType = getPath(request.url);
+  const settingType = getSettingsPath(request.url);
   const client = new Client(env.CLOUD_NAME, env.KEY, env.SECRET);
 
   // Handle settings and meta fields

@@ -1,5 +1,5 @@
 {
-  "name": "bynder-editor-plugin",
+  "name": "brandfolder-editor-plugin",
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@vev/utils": "^1.2.15",
-    "@vev/react": "^0.3.3"
+    "@vev/react": "^0.3.3",
+    "shared": "*"
   }
 }

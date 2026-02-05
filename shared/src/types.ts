@@ -1,0 +1,9 @@
+export type SettingsType = 'global' | 'workspace' | 'team' | 'meta_fields' | null;
+
+export type EditorPluginAssetSourceFilterField = {
+  label: string;
+  value: string;
+  fields: { label: string; value: string }[];
+};
+
+export type EditorPluginAssetSourceFilterFields = EditorPluginAssetSourceFilterField[];
