@@ -9,12 +9,11 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/react": "^18.3.4",
     "prettier": "2.7.0",
     "typescript-plugin-css-modules": "^5.0.1"
   },
   "dependencies": {
-    "@vev/react": "^0.1.11",
-    "react": "^18.2.0"
+    "@vev/react": "^0.3.3",
+    "@vev/utils": "1.2.15"
   }
 }
