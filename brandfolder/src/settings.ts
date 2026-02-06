@@ -1,33 +1,14 @@
 import { BrandfolderClient } from './client';
 import { VevProps } from '@vev/utils';
+import {
+  SettingsType,
+  EditorPluginAssetSourceFilterFields,
+  getSettingsPath,
+  getPropertiesFromRequest as getPropertiesFromRequestBase,
+} from 'shared';
 
-type settingsType = 'global' | 'workspace' | 'team' | 'meta_fields' | null;
-
-export type EditorPluginAssetSourceFilterField = {
-  label: string;
-  value: string;
-  fields: { label: string; value: string }[];
-};
-
-export type EditorPluginAssetSourceFilterFields = EditorPluginAssetSourceFilterField[];
-
-export function getSettingsPath(url: string): settingsType {
-  try {
-    const settings = url.split('/').splice(-2)[0];
-    const type = url.split('/').splice(-1)[0];
-
-    if (
-      settings === 'settings' &&
-      (type === 'global' || type === 'workspace' || type === 'team' || type === 'meta_fields')
-    ) {
-      return type;
-    }
-
-    return null;
-  } catch (e) {
-    return null;
-  }
-}
+export { getSettingsPath };
+export type { EditorPluginAssetSourceFilterFields };
 
 export async function getMetaFields(
   client: BrandfolderClient,
@@ -63,7 +44,7 @@ export async function getMetaFields(
   return metaProps;
 }
 
-export async function getSettings(type: settingsType, client: BrandfolderClient): Promise<any> {
+export async function getSettings(type: SettingsType, client: BrandfolderClient): Promise<any> {
   switch (type) {
     case 'global':
       return getSettingsForm(client);
@@ -106,17 +87,5 @@ export type RequestProperties = {
 };
 
 export async function getPropertiesFromRequest(request: Request): Promise<RequestProperties> {
-  try {
-    const properties = await request.json();
-
-    if (properties.assetType) {
-      properties.assetType = properties.assetType.toLowerCase();
-    }
-
-    return properties as RequestProperties;
-  } catch (e) {
-    console.log(e);
-    console.log('No request body');
-    return {};
-  }
+  return getPropertiesFromRequestBase<RequestProperties>(request, { normalizeAssetType: true });
 }

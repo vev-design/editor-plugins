@@ -5,7 +5,7 @@ import {
   ProjectImageAsset,
   ProjectVideoAsset,
 } from "@vev/utils";
-import { getPath, getPropertiesFromRequest } from "./settings";
+import { getSettingsPath, getPropertiesFromRequest } from "./settings";
 
 const API_IMAGE = "https://api.pexels.com/v1/search";
 const API_IMAGE_CURATED = "https://api.pexels.com/v1/curated";
@@ -103,7 +103,7 @@ async function handler(
   const urlSearchParams = new URLSearchParams(url.search);
   const search = urlSearchParams.get("search");
 
-  const settingType = getPath(request.url);
+  const settingType = getSettingsPath(request.url);
 
   // Handle settings and meta fields
   if (settingType === "meta_fields") {

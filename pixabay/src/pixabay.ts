@@ -5,7 +5,7 @@ import {
   ProjectImageAsset,
   ProjectVideoAsset,
 } from "@vev/utils";
-import { getPath, getPropertiesFromRequest } from "./settings";
+import { getSettingsPath, getPropertiesFromRequest } from "./settings";
 
 const API_IMAGE = "https://pixabay.com/api";
 const API_VIDEO = "https://pixabay.com/api/videos/";
@@ -96,7 +96,7 @@ async function handler(
   const urlSearchParams = new URLSearchParams(url.search);
   const search = urlSearchParams.get("search");
 
-  const settingType = getPath(request.url);
+  const settingType = getSettingsPath(request.url);
 
   // Handle settings and meta fields
   if (settingType === "meta_fields") {
