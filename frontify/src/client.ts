@@ -55,9 +55,9 @@ query Libraries($brandId: ID!) {
     }) as { id: string; name: string }[];
   }
 
-  async searchAssetsInLibrary(libraryId: string, search: string) {
+  async searchAssetsInLibrary(libraryId: string, search?: string) {
     const query = `
-query SearchInMediaLibrary($libraryId: ID!, $search: String!, $page: Int = 1, $limit: Int = 25) {
+query SearchInMediaLibrary($libraryId: ID!, $search: String, $page: Int = 1, $limit: Int = 25) {
   library(id: $libraryId) {
     ... on MediaLibrary {
       assets(page: $page, limit: $limit, query: { search: $search }) {
@@ -83,13 +83,18 @@ query SearchInMediaLibrary($libraryId: ID!, $search: String!, $page: Int = 1, $l
 }
     `;
 
-    const results = await this.query(query, { libraryId, search });
+    const variables: Record<string, any> = { libraryId };
+    if (search) {
+      variables.search = search;
+    }
+
+    const results = await this.query(query, variables);
     return results.data.library.assets.items.filter(
       (item) => item.__typename === 'Image',
     ) as FrontifyAsset[];
   }
 
-  async searchAllAssets(search: string) {
+  async searchAllAssets(search?: string) {
     const mediaLibraries = await this.getMediaLibraries();
 
     const results = await Promise.all(

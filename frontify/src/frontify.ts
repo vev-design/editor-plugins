@@ -37,15 +37,15 @@ async function handler(
   const urlSearchParams = new URLSearchParams(url.search);
   const search = urlSearchParams.get('search');
 
-  const libraryFilter = requestProperties.filter.find((value) => {
+  const libraryFilter = requestProperties.filter?.find((value) => {
     return value.field === 'library';
   });
 
   let results: FrontifyAsset[] = [];
   if (libraryFilter && libraryFilter.value) {
-    results = await client.searchAssetsInLibrary(libraryFilter.value, search || '');
+    results = await client.searchAssetsInLibrary(libraryFilter.value, search || undefined);
   } else {
-    results = await client.searchAllAssets(search || '');
+    results = await client.searchAllAssets(search || undefined);
   }
 
   return await Promise.all(
