@@ -7,7 +7,11 @@ export function getSettingsPath(url: string): SettingsType {
 
     if (
       settings === 'settings' &&
-      (type === 'global' || type === 'workspace' || type === 'team' || type === 'meta_fields')
+      (type === 'global' ||
+        type === 'workspace' ||
+        type === 'team' ||
+        type === 'meta_fields' ||
+        type === 'asset_picker')
     ) {
       return type as SettingsType;
     }

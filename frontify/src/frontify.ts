@@ -9,23 +9,26 @@ import {
   ProjectAsset,
 } from '@vev/utils';
 import { mapAssetToVevAsset } from './asset-mappers';
+import { getAssetPicker } from './get-asset-picker';
 
 async function handler(
   request: Request,
   env: Record<string, string>,
   kv: EditorPluginKv,
-): Promise<ProjectAsset[] | EditorPluginSettings | EditorPluginAssetSourceFilterFields> {
+): Promise<ProjectAsset[] | EditorPluginSettings | EditorPluginAssetSourceFilterFields | Response> {
   const requestProperties = await getPropertiesFromRequest(request);
   const { assetType } = requestProperties;
 
   if (assetType === 'video') return [];
 
   const settingType = getSettingsPath(request.url);
-
+  console.log('settingType', settingType);
   const client = new FrontifyClient(env.domain, env.apiKey, requestProperties.brand_id);
 
   // Handle settings
-  if (settingType === 'meta_fields') {
+  if (settingType === 'asset_picker') {
+    return getAssetPicker();
+  } else if (settingType === 'meta_fields') {
     return getMetaFields(client, [assetType]);
   } else if (settingType) {
     return getSettings(settingType, client);

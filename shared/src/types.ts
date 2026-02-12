@@ -1,4 +1,4 @@
-export type SettingsType = 'global' | 'workspace' | 'team' | 'meta_fields' | null;
+export type SettingsType = 'global' | 'workspace' | 'team' | 'meta_fields' | 'asset_picker' | null;
 
 export type EditorPluginAssetSourceFilterField = {
   label: string;
