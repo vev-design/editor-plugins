@@ -22,12 +22,11 @@ async function handler(
   if (assetType === 'video') return [];
 
   const settingType = getSettingsPath(request.url);
-  console.log('settingType', settingType);
   const client = new FrontifyClient(env.domain, env.apiKey, requestProperties.brand_id);
 
   // Handle settings
   if (settingType === 'asset_picker') {
-    return getAssetPicker();
+    return getAssetPicker(env.domain);
   } else if (settingType === 'meta_fields') {
     return getMetaFields(client, [assetType]);
   } else if (settingType) {
