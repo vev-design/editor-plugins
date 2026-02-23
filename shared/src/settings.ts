@@ -2,8 +2,9 @@ import { SettingsType } from './types';
 
 export function getSettingsPath(url: string): SettingsType {
   try {
-    const settings = url.split('/').splice(-2)[0];
-    const type = url.split('/').splice(-1)[0];
+    const urlObj = new URL(url);
+    const settings = urlObj.pathname.split('/').splice(-2)[0];
+    const type = urlObj.pathname.split('/').splice(-1)[0];
 
     if (
       settings === 'settings' &&
