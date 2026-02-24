@@ -1,0 +1,45 @@
+
+<html>
+<head>
+  <style>*, html, body { margin: 0; padding: 0; box-sizing: border-box; }</style>
+</head>
+<body>
+<script>
+function mapAssetToVevImageAsset(asset): ProjectImageAsset {
+  return {
+    key: asset.GUID,
+    filename: asset.title,
+    url: asset.embed_link,
+    thumb: asset.thumbnailUrlCdn,
+    updated: Date.now(),
+    dimension: { width: asset.pixelWidth, height: asset.pixelHeight },
+    mimeType: asset.mimetype,
+    metaData: {
+      description: asset.extendedKeywords || '',
+      width: asset.pixelWidth + '',
+      height: asset.pixelHeight + '',
+    },
+    selfHosted: false,
+  };
+}
+
+window.initBwkzAssetInsert = () => {
+  const obj = {
+    auth: {
+      type: 'internal',
+      consumerId: 'colliers-vev-live',
+      consumerSecret: 'XlkXceKMYKCNQ1x7',
+      clientDb: 'brandworkz_colliers',
+      username: 'VevWebsites',
+      password: 'C011iers',
+    },
+  };
+  return obj;
+};
+
+  window.finishBwkzAssetInsert = (response) => {
+    const assets = response.data.map(mapAssetToVevImageAsset);
+    console.log('assets', assets);
+    window.opener.postMessage({ type: 'pickAsset', assets }, '*');
+  };
+</script>
