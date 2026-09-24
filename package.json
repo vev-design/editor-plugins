@@ -10,7 +10,8 @@
     "cloudinary",
     "pixabay",
     "unsplash",
-    "pexels"
+    "pexels",
+    "box"
   ],
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.24.1",
