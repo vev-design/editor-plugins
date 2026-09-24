@@ -12,7 +12,7 @@ Users can find images in two ways:
 The plugin imports images only: JPEG, PNG, GIF, and WebP, up to 50 MB.
 Vev copies each selected image to the project CDN.
 
-For the general platform guide, see [OAuth editor plugins](../docs/oauth.md).
+For customer setup steps, see [SETUP.md](SETUP.md). For the general platform guide, see [OAuth editor plugins](../docs/oauth.md).
 
 ## How OAuth works
 
@@ -65,7 +65,7 @@ If your Box enterprise restricts third-party apps, a Box admin must enable the a
 
 ## Install the plugin in Vev
 
-1. In Vev, open **Account settings** > **Integrations** and select **Box**.
+1. In Vev, open **Account settings** > **Editor plugins** and select **Box**.
 2. Enter the Box **Client ID** and **Client Secret**.
 3. Copy the callback URL from the install form. Do not construct this URL manually.
 4. In the Box Developer Console, on the **Configuration** tab, add the callback URL under **OAuth 2.0 Redirect URIs**. Select **Save Changes**.
@@ -76,7 +76,7 @@ If your Box enterprise restricts third-party apps, a Box admin must enable the a
 Each editor user does these steps once.
 
 1. Open a project in the Vev editor and open the asset panel.
-2. Select the **Box** source and select **Connect**.
+2. Select the Box icon next to the search field.
 3. In the popup, log in to Box and select **Grant access to Box**.
 4. If the browser blocks the popup, allow popups for the editor and select **Connect** again.
 
@@ -110,15 +110,15 @@ OAuth support requires a Vev CLI with wrapper protocol version `1`.
 
 ## Box API calls
 
-| Purpose                     | Endpoint                                                         |
-| --------------------------- | ---------------------------------------------------------------- |
-| Search images               | `GET /2.0/search?type=file&file_extensions=jpg,jpeg,png,gif,webp` |
-| Recent images (empty search) | `GET /2.0/recent_items`                                         |
-| Folder listing (picker)     | `GET /2.0/folders/{id}` and `GET /2.0/folders/{id}/items`        |
-| Thumbnail                   | `GET /2.0/files/{id}/thumbnail.png?min_width=160&min_height=160` |
-| Download (Vev import)       | `GET /2.0/files/{id}/content`, 302 to `dl.boxcloud.com`          |
-| Connection label            | `GET /2.0/users/me` (`login` field)                              |
-| Disconnect                  | `POST /oauth2/revoke`                                            |
+| Purpose                      | Endpoint                                                          |
+| ---------------------------- | ----------------------------------------------------------------- |
+| Search images                | `GET /2.0/search?type=file&file_extensions=jpg,jpeg,png,gif,webp` |
+| Recent images (empty search) | `GET /2.0/recent_items`                                           |
+| Folder listing (picker)      | `GET /2.0/folders/{id}` and `GET /2.0/folders/{id}/items`         |
+| Thumbnail                    | `GET /2.0/files/{id}/thumbnail.png?min_width=160&min_height=160`  |
+| Download (Vev import)        | `GET /2.0/files/{id}/content`, 302 to `dl.boxcloud.com`           |
+| Connection label             | `GET /2.0/users/me` (`login` field)                               |
+| Disconnect                   | `POST /oauth2/revoke`                                             |
 
 ## Limits
 
@@ -130,17 +130,17 @@ OAuth support requires a Vev CLI with wrapper protocol version `1`.
 
 ## Troubleshooting
 
-| Symptom                                     | Action                                                                           |
-| ------------------------------------------- | -------------------------------------------------------------------------------- |
-| Box shows `redirect_uri_mismatch`           | Copy the callback URL from the Vev install form into the Box app again.          |
-| Box shows `unauthorized_client`             | A Box admin must enable the app for the enterprise.                              |
-| Box shows `invalid_scope`                   | Enable the read and write scopes in the Box app.                                 |
+| Symptom                                            | Action                                                                                                     |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Box shows `redirect_uri_mismatch`                  | Copy the callback URL from the Vev install form into the Box app again.                                    |
+| Box shows `unauthorized_client`                    | A Box admin must enable the app for the enterprise.                                                        |
+| Box shows `invalid_scope`                          | Enable the read and write scopes in the Box app.                                                           |
 | `vev deploy` fails with `oauth_reinstall_required` | The OAuth config changed (for example, scopes). Uninstall the plugin in Vev, deploy, and install it again. |
-| Import fails with `oauth_invalid_image`     | Box refused the download. Enable the write scope, then disconnect and connect.   |
-| `oauth_expired`                             | Select **Reconnect** in the editor.                                              |
-| `oauth_asset_host_denied` on import         | Box redirected to a host not in `assetRedirectHosts`. Add the host and redeploy. |
-| Picker window shows `oauth_required`        | The picker session expired. Close the window and open the picker again.          |
-| No thumbnails                               | Box has not generated the thumbnail yet. Search again later.                     |
+| Import fails with `oauth_invalid_image`            | Box refused the download. Enable the write scope, then disconnect and connect.                             |
+| `oauth_expired`                                    | Select **Reconnect** in the editor.                                                                        |
+| `oauth_asset_host_denied` on import                | Box redirected to a host not in `assetRedirectHosts`. Add the host and redeploy.                           |
+| Picker window shows `oauth_required`               | The picker session expired. Close the window and open the picker again.                                    |
+| No thumbnails                                      | Box has not generated the thumbnail yet. Search again later.                                               |
 
 ## Icons
 
