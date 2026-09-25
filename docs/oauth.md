@@ -242,7 +242,8 @@ Set `requiresAuth: true` when the image download requires a provider bearer toke
 Return a stable provider asset `key`, `url`, `mimeType`, and numeric `updated` timestamp.
 Do not supply `oauthSource`; the editor owns that temporary field.
 
-The editor displays a placeholder when the preview requires authentication.
+The editor shows `thumb` for authenticated images when it is an inline base64 PNG, JPEG, GIF, or WebP data URI.
+Else it shows a placeholder. Load the thumbnail on the server; the browser never gets the provider token.
 After selection, Vev downloads the image and saves the imported CDN values in the project.
 Authenticated imports bypass `publicImages`.
 `requiresAuth` takes precedence over `selfHosted`.
