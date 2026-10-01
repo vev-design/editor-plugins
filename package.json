@@ -11,7 +11,8 @@
     "pixabay",
     "unsplash",
     "pexels",
-    "box"
+    "box",
+    "adobe-cc-libraries"
   ],
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.24.1",
