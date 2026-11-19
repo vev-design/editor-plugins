@@ -50,7 +50,7 @@ export class BynderClient {
   private async getAccessToken(): Promise<string> {
     const kvRes = await this.kv.get<string>([KVKeys.accessToken]);
     if (kvRes.value) {
-      console.log(`Using access token from KV: ${kvRes.value}`);
+      console.log("Using access token from KV");
       return kvRes.value;
     } else {
       return await this.requestNewAccessToken();
